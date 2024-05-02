@@ -13,16 +13,15 @@ type Ripple = {
   opacity?: number
 }
 
-type Detail = {
+type Point = {
   x: number
   y: number
-  width: number
 }
 
 
 const RippleButton = forwardRef<TouchableOpacity, Props>((props, ref) => {
   const { onPressIn, onPressOut, ripple, style, ...rest } = props;
-  const origin = useSharedValue<Detail>({ x: 0, y: 0, width: 0 });
+  const origin = useSharedValue<Point>({ x: 0, y: 0 });
   const radius = useSharedValue(0);
   const opacity = useSharedValue(0);
 
@@ -39,10 +38,10 @@ const RippleButton = forwardRef<TouchableOpacity, Props>((props, ref) => {
 
   const onPressedIn = useCallback((e: GestureResponderEvent) => {
     onPressIn?.(e);
-    origin.value = { ...origin.value, x: e.nativeEvent.locationX, y: e.nativeEvent.locationY };
+    origin.value = { x: e.nativeEvent.locationX, y: e.nativeEvent.locationY };
     radius.value = 0;
     opacity.value = 0;
-    radius.value = withTiming(ripple?.radius ?? Math.sqrt(origin.value.width));
+    radius.value = withTiming(ripple?.radius ?? 250);
     opacity.value = withTiming(ripple?.opacity ?? 0.5);
   }, [onPressIn, ripple]);
 
@@ -55,7 +54,6 @@ const RippleButton = forwardRef<TouchableOpacity, Props>((props, ref) => {
     <TouchableOpacity
       ref={ref}
       activeOpacity={1}
-      onLayout={({ nativeEvent: { layout } }) => origin.value = { ...origin.value, width: layout.width }}
       onPressIn={onPressedIn}
       onPressOut={onPressedOut}
       style={[styles.container, style]}
