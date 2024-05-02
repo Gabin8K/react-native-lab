@@ -7,12 +7,7 @@ const Index = () => {
 
   return (
     <View style={styles.container}>
-      <RippleButton
-        ripple={{
-          color: 'grey',
-          radius: 300,
-        }}
-      >
+      <RippleButton>
         <Text style={styles.text}>
           Simple button
         </Text>
