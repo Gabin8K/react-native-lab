@@ -295,6 +295,6 @@ export const recettesCuisine = [
   .sort((e1, e2) => e1.title.localeCompare(e2.title))
   .map((item, index, array) => ({
     ...item,
-    active: item.id === 33,
+    active: false,
     label: array[index - 1] ? array[index - 1].title[0] !== item.title[0] ? item.title[0] : undefined : item.title[0]
   }));
