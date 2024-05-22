@@ -1,8 +1,8 @@
-import { ListRenderItemInfo, StyleSheet, Text, View, ViewToken } from 'react-native'
+import { ListRenderItemInfo, StyleSheet, View, ViewToken } from 'react-native'
 import React, { FunctionComponent, useCallback, useMemo, useRef, useState } from 'react'
-import ListItem, { ListItemOneProps, ListItemTwoProps } from './ListItem'
+import ListItem, { Coord } from './ListItem'
 import Animated from 'react-native-reanimated'
-import { recettesCuisine } from '../../utils/constants'
+import { Receip, recettesCuisine } from '../../utils/constants'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -10,16 +10,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const AnimatedList: FunctionComponent = () => {
   const [receips] = useState(recettesCuisine)
+  const [coord, setCoord] = useState<Coord>()
+  const [count, setCount] = useState(0)
   const [currentId, setCurrentId] = useState<number>()
 
   const insets = useSafeAreaInsets()
 
-  const listOne = useRef<Animated.FlatList<ListItemOneProps>>(null)
-  const listTwo = useRef<Animated.FlatList<ListItemTwoProps>>(null)
+  const countRef = useRef(0)
+  const listOne = useRef<Animated.FlatList<Receip>>(null)
+  const listTwo = useRef<Animated.FlatList<Receip>>(null)
 
   const receipsLabels = useMemo(() => receips.filter(receip => receip.label), [receips])
-
-
 
   const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     if (viewableItems.length > 0) {
@@ -31,7 +32,7 @@ const AnimatedList: FunctionComponent = () => {
     return null
   }, [receipsLabels])
 
-  const renderItemOne = useMemo(() => ({ item }: ListRenderItemInfo<ListItemOneProps>) => {
+  const renderItemOne = useMemo(() => ({ item }: ListRenderItemInfo<Receip>) => {
     return (
       <ListItem.ListItemOne
         {...item}
@@ -46,10 +47,14 @@ const AnimatedList: FunctionComponent = () => {
     )
   }, [currentId, receips])
 
-  const renderItemTwo = useMemo(() => ({ item }: ListRenderItemInfo<ListItemTwoProps>) => {
+  const renderItemTwo = useMemo(() => ({ item }: ListRenderItemInfo<Receip>) => {
     return (
       <ListItem.ListItemTwo
         {...item}
+        onSelected={(coord) => {
+          countRef.current++
+          setCoord(coord as Coord)
+        }}
       />
     )
   }, [])
@@ -68,9 +73,9 @@ const AnimatedList: FunctionComponent = () => {
         start={[.5, 0]}
         end={[.5, .7]}
       >
-        <Text style={styles.title}>
-          Recette de cuisine
-        </Text>
+        <ListItem.ListItemHeader
+          count={count}
+        />
         <Animated.FlatList
           ref={listOne}
           horizontal
@@ -87,9 +92,19 @@ const AnimatedList: FunctionComponent = () => {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
       />
+      {coord ?
+        <ListItem.ListItemCountAnimated
+          count={countRef.current}
+          coord={coord}
+          setCoord={setCoord}
+          setCount={setCount}
+        /> :
+        null
+      }
     </View>
   )
 }
+
 
 export default AnimatedList
 
@@ -101,10 +116,6 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     rowGap: 16,
     paddingBottom: 8
-  },
-  title: {
-    fontFamily: 'UbB',
-    fontSize: 28,
   },
   list: {
     marginRight: 16,

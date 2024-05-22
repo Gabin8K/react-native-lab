@@ -2,7 +2,16 @@ import { Dimensions } from 'react-native';
 export const { width: Width, height: Height } = Dimensions.get('window');
 
 
-export const recettesCuisine = [
+export type Receip = {
+  active: boolean;
+  label: string | undefined;
+  id: number;
+  title: string;
+  emoji: string;
+  description: string;
+}
+
+export const recettesCuisine: Receip[] = [
   {
     id: 1,
     title: 'Poulet',
