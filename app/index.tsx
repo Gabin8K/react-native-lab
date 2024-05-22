@@ -1,34 +1,9 @@
 import React from "react"
-import { StyleSheet, Text, View } from "react-native"
-import RippleButton from "../components/RippleButton"
-
+import AnimatedList from "../components/AnimateList/AnimatedList"
 
 const Index = () => {
-
   return (
-    <View style={styles.container}>
-      <RippleButton>
-        <Text style={styles.text}>
-          Simple button
-        </Text>
-      </RippleButton>
-    </View>
+    <AnimatedList/>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    rowGap: 20,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  text: {
-    width: 150,
-    textAlign: 'center',
-    paddingVertical: 20,
-    backgroundColor: "lightblue",
-  }
-})
-
 export default Index
