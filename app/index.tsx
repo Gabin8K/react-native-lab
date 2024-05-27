@@ -1,5 +1,5 @@
 import React from "react"
-import AnimationNumbers from "../components/AnimationNumbers"
+import AnimationNumbers from "../components/AnimateNumbers/AnimationNumbers"
 
 const Index = () => {
   return (
