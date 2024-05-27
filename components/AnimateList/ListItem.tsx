@@ -1,5 +1,5 @@
 import React, { FC, Fragment, memo, useCallback, useEffect } from "react";
-import { GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
+import { GestureResponderEvent, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { Width } from "../../utils/constants";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -146,12 +146,13 @@ const ListItemCountAnimated: FC<ListItemCountAnimatedProps> = memo(({ count, coo
   }), [])
 
   useEffect(() => {
+    const size = Platform.select({ ios: 43, default: 13 })
     left.value = withTiming(Width - 50, { duration: 500 }, finished => {
       if (finished) {
         runOnJS(setCount)(count)
       }
     })
-    top.value = withTiming(insets.top - 43, { duration: 600 }, finished => {
+    top.value = withTiming(insets.top - size, { duration: 600 }, finished => {
       if (finished) {
         runOnJS(setCoord)(undefined)
       }

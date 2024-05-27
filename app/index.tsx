@@ -1,9 +1,9 @@
 import React from "react"
-import AnimatedList from "../components/AnimateList/AnimatedList"
+import AnimationNumbers from "../components/AnimationNumbers"
 
 const Index = () => {
   return (
-    <AnimatedList/>
+    <AnimationNumbers/>
   )
 }
 export default Index
