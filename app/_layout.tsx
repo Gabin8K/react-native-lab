@@ -16,7 +16,8 @@ export default function RootLayout() {
   useEffect(() => {
     const launchSetting = async () => {
       if (Platform.OS !== 'android') return;
-      await NavigationBar.setBackgroundColorAsync('white');
+      await NavigationBar.setPositionAsync('absolute');
+      await NavigationBar.setBackgroundColorAsync('transparent');
     }
     launchSetting();
   }, []);

@@ -1,9 +1,11 @@
 import React from "react"
-import AnimationNumbers from "../components/AnimateNumbers/AnimationNumbers"
+import SvgComponent from "../components/SvgAnimated/SvgComponent"
 
 const Index = () => {
   return (
-    <AnimationNumbers/>
+    <SvgComponent />
   )
 }
+
+
 export default Index

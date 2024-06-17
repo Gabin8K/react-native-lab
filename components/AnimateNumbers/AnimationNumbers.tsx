@@ -1,10 +1,10 @@
 import React, { FC, memo, useState } from 'react'
-import { StyleSheet, Pressable, View, Text } from 'react-native'
+import { StyleSheet, Pressable, View } from 'react-native'
 import Animated, { LinearTransition, SlideInUp, SlideOutDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { IconProps } from 'react-native-vector-icons/Icon'
 import Ionicon from 'react-native-vector-icons/Ionicons'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import Slider from '@react-native-community/slider'
+import Slider from '../Slider'
 
 
 type ButtonProps = IconProps & {
@@ -46,17 +46,7 @@ export default function AnimationNumbers() {
         <View
           style={style.footer}
         >
-          <View style={style.rowStep}>
-            <Slider
-              style={style.slider}
-              maximumValue={100}
-              minimumValue={1}
-              thumbTintColor={'#e6e6e6'}
-              minimumTrackTintColor={'#9d9d9d'}
-              onValueChange={value => setStep(Math.floor(value))}
-            />
-            <Text style={style.step}>{step}</Text>
-          </View>
+          <Slider onChange={setStep} />
           <View style={style.row}>
             <Button
               name={'remove-sharp'}
@@ -142,13 +132,6 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  rowStep: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  slider: {
-    flex: 1,
-  },
   button: {
     width: 50,
     height: 50,
@@ -156,10 +139,4 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  step: {
-    width: 50,
-    maxWidth: 50,
-    fontFamily: 'UbB',
-    color: 'grey',
-  }
 })
