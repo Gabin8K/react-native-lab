@@ -17,7 +17,7 @@ export default function RootLayout() {
     const launchSetting = async () => {
       if (Platform.OS !== 'android') return;
       await NavigationBar.setPositionAsync('absolute');
-      await NavigationBar.setBackgroundColorAsync('transparent');
+      await NavigationBar.setBackgroundColorAsync('#FFFFFF00');
     }
     launchSetting();
   }, []);

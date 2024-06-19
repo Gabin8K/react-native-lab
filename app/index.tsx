@@ -1,9 +1,9 @@
 import React from "react"
-import SvgComponent from "../components/SvgAnimated/SvgComponent"
+import CalendarComponent from "../components/Calendar/CalendarComponent"
 
 const Index = () => {
   return (
-    <SvgComponent />
+    <CalendarComponent />
   )
 }
 
