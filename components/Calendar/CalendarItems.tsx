@@ -1,7 +1,8 @@
-import React, { memo, ReactNode, useEffect } from 'react'
+import React, { FC, memo, ReactNode, useEffect } from 'react'
 import { Text, PressableProps, StyleProp, Pressable, StyleSheet, View, ViewStyle } from 'react-native'
-import { DateCell } from './CalendarComponent'
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
+import { DateCell, WEEKS } from '../../utils/date'
+import { Width } from '../../utils/constants'
 
 
 interface ButtonProps extends PressableProps {
@@ -10,12 +11,8 @@ interface ButtonProps extends PressableProps {
   children: ReactNode,
 }
 
-type WeekComponentProps = {
-  weeks: string[],
-}
 
 type CalendarComponentProps = {
-  weeks: string[],
   days: DateCell[],
   onPress: (cell: DateCell) => void,
 }
@@ -26,7 +23,7 @@ type ToastCalendarProps = {
 }
 
 
-export const CalendarButton = (props: ButtonProps) => {
+export const CalendarButton = memo((props: ButtonProps) => {
   const { style, active, ...rest } = props
   return (
     <Pressable
@@ -48,13 +45,13 @@ export const CalendarButton = (props: ButtonProps) => {
       </Text>
     </Pressable>
   )
-}
+})
 
 
-export const WeekComponent = (props: WeekComponentProps) => {
+export const WeekComponent: FC = () => {
   return (
     <View style={styles.containerWeek}>
-      {props.weeks.map((week) => (
+      {WEEKS.map((week) => (
         <Text
           key={week}
           style={styles.textWeek}
@@ -94,13 +91,14 @@ export const ToastCalendar = (props: ToastCalendarProps) => {
 
 
 export const PageComponent = memo((props: CalendarComponentProps) => {
+
   const onPress = (cell: DateCell) => () => {
     props.onPress(cell)
   }
 
   return (
     <View style={styles.containerPage}>
-      {props.weeks.map((week, i) => (
+      {WEEKS.map((week, i) => (
         <View
           key={`${week}-${i}`}
           style={styles.pageColumn}
@@ -144,35 +142,32 @@ const styles = StyleSheet.create({
   containerWeek: {
     flexDirection: 'row',
     alignItems: 'center',
-    columnGap: 10,
+    columnGap: 5,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    marginBottom: 15,
     borderBottomColor: '#d1d5db',
   },
   textWeek: {
-    width: 40,
+    width: 45,
     textAlign: 'center',
     fontFamily: 'UbB',
     fontSize: 18,
   },
   containerPage: {
+    width: Width,
+    justifyContent: 'center',
     flexDirection: 'row',
     height: 300,
-    columnGap: 10,
-  },
-  pageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     columnGap: 10,
   },
   pageColumn: {
     flexDirection: 'column',
     alignItems: 'center',
-    rowGap: 10,
+    rowGap: 5,
   },
   pageBtn: {
-    width: 40,
+    width: 45,
+    height: '100%',
     padding: 0,
     alignItems: 'center',
     justifyContent: 'center',

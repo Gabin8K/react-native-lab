@@ -1,63 +1,29 @@
-import { View, StyleSheet, Text } from 'react-native'
-import React, { useMemo, useState } from 'react'
+import { View, StyleSheet, Text, ListRenderItemInfo, FlatList } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CalendarButton, PageComponent, ToastCalendar, WeekComponent } from './CalendarItems'
+import Animated from 'react-native-reanimated'
+import { currentDate, DateCell, MONTHS, nextDate, prevDate } from '../../utils/date'
+import { Width } from '../../utils/constants'
 
 type Props = {}
 
-export type DateCell = {
-  day: number
-  week: number
-  active?: boolean
-  isCurrent?: boolean
+type DateState = {
+  date: Date,
+  dateCell: DateCell[]
 }
-
-const WEEKS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-const currentDate = (date: Date) => {
-  const length = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
-  return Array.from<any, DateCell>({ length }, (_, i) => {
-    return {
-      day: i + 1,
-      isCurrent: true,
-      active: i + 1 === new Date().getDate(),
-      week: new Date(date.getFullYear(), date.getMonth(), i + 1).getDay()
-    }
-  })
-}
-
-const prevDate = (date: Date, week: number) => {
-  const length = new Date(date.getFullYear(), date.getMonth(), 0).getDate()
-  return Array.from<any, DateCell>({ length }, (_, i) => {
-    return {
-      day: i + 1,
-      isCurrent: false,
-      week: new Date(date.getFullYear(), date.getMonth() - 1, i + 1).getDay()
-    }
-  }).slice(-week)
-}
-
-const nextDate = (date: Date, week: number) => {
-  const length = new Date(date.getFullYear(), date.getMonth() + 2, 0).getDate()
-  return Array.from<any, DateCell>({ length }, (_, i) => {
-    return {
-      day: i + 1,
-      isCurrent: false,
-      week: new Date(date.getFullYear(), date.getMonth() + 1, i + 1).getDay()
-    }
-  })
-    .slice(0, 6 - week)
-}
-
-
 
 
 const CalendarComponent = (props: Props) => {
 
-  const [date, setDate] = useState(new Date())
+  const [dates, setDates] = useState<DateState[]>([])
   const [cell, setCell] = useState<DateCell>()
+  
+  const ref = useRef<FlatList>(null)
+  const offset = useRef(Width)
 
-  const calendar = useMemo(() => {
+  // const display = date?.[1]?.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) ?? 'Empty'
+
+  const buildCalendar = useCallback((date: Date) => {
     let data = currentDate(date)
     const firstDay = data.find((d) => d.day === 1)
     const lastDay = data.at(-1)
@@ -75,50 +41,107 @@ const CalendarComponent = (props: Props) => {
     }
 
     return data
-  }, [date])
+  }, [])
 
 
-  const addMonth = () => {
-    setDate(new Date(date.setMonth(date.getMonth() + 1)))
+  useEffect(() => {
+    const date = new Date()
+    const prevDate = new Date()
+    const nextDate = new Date()
+    
+    prevDate.setMonth(date.getMonth() - 1)
+    nextDate.setMonth(date.getMonth() + 1)
+
+    setDates([
+      { date: prevDate, dateCell: buildCalendar(prevDate) },
+      { date: date, dateCell: buildCalendar(date) },
+      { date: nextDate, dateCell: buildCalendar(nextDate) },
+    ])
+  }, [])
+
+
+  const renderItem = useMemo(() => ({ item }: ListRenderItemInfo<DateState>) => {
+    return (
+      <PageComponent
+        days={item.dateCell}
+        onPress={() => { }}
+      />
+    )
+  }, [])
+
+
+  const addMonth = useCallback(() => {
+    setDates((dates) => {
+      const date = new Date(dates.at(-1)?.date!!)
+      date.setMonth(date.getMonth() + 1)
+      return [
+        ...dates,
+        { date, dateCell: buildCalendar(date) }
+      ]
+    })
+  }, [])
+
+
+  const subMonth = useCallback(() => {
+    setDates((dates) => {
+      const date = new Date(dates.at(0)?.date!!)
+      date.setMonth(date.getMonth() - 1)
+      return [
+        { date, dateCell: buildCalendar(date) },
+        ...dates,
+      ]
+    })
+  }, [])
+
+
+  const onPressNext = () => {
+    ref.current?.scrollToOffset({ offset: offset.current+Width, animated: true })
+    offset.current += Width
   }
 
-  const subMonth = () => {
-    setDate(new Date(date.setMonth(date.getMonth() - 1)))
+
+  const onPressPrev = () => {
+    ref.current?.scrollToOffset({ offset: offset.current - Width, animated: true })
+    offset.current -= Width
   }
 
   const onPress = (cell: DateCell) => {
     setCell(cell)
   }
 
-  const clear = ()=>{
+  const clear = () => {
     setCell(undefined)
   }
-
+  console.log(dates.length)
   return (
     <View style={styles.container}>
-      <Text style={styles.textMonth}>{MONTHS[date.getMonth()]}</Text>
-      <WeekComponent weeks={WEEKS} />
-      <PageComponent
-        key={Date.now()}
-        weeks={WEEKS}
-        days={calendar}
-        onPress={onPress}
+      <Text style={styles.textMonth}>{'display'}</Text>
+      <WeekComponent />
+      <Animated.FlatList
+        ref={ref}
+        horizontal
+        data={dates}
+        pagingEnabled
+        renderItem={renderItem}
+        onEndReached={addMonth}
+        onEndReachedThreshold={.8}
+        showsHorizontalScrollIndicator={false}
       />
       < View style={styles.footer}>
-        <CalendarButton onPress={subMonth} >
+        <CalendarButton onPress={onPressPrev} >
           {'<'}
         </CalendarButton>
-        <CalendarButton onPress={addMonth} >
+        <CalendarButton onPress={onPressNext} >
           {'>'}
         </CalendarButton>
       </View>
-      {cell ?
+      {/* {cell ?
         <ToastCalendar
-          text={`${cell.day} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`}
+          text={`${cell.day} ${MONTHS[date?.[1].date.getMonth()]} ${date?.[1].date.getFullYear()}`}
           clear={clear}
         /> :
         null
-      }
+      } */}
     </View>
   )
 }
@@ -126,17 +149,20 @@ const CalendarComponent = (props: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    paddingTop: '20%',
+    rowGap: 10,
     alignItems: 'center',
   },
   textMonth: {
     fontFamily: 'UbB',
-    fontSize: 50,
-    marginBottom: 50
+    fontSize: 40,
+    marginBottom: 40
   },
   footer: {
+    position: 'absolute',
     flexDirection: 'row',
-    marginTop: 50,
+    bottom: 120,
+    marginTop: 80,
     columnGap: 20
   }
 })
